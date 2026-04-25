@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Juego Matemático PRO</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: radial-gradient(circle, #001f4d, #000814);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  display: flex;
+  width: 1000px;
+}
+
+.quiz-box {
+  flex: 2;
+  background: #002b80;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+.points-box {
+  flex: 1;
+  margin-left: 20px;
+  background: #001a4d;
+  padding: 20px;
+  border-radius: 15px;
+}
+
+button {
+  width: 100%;
+  margin: 8px 0;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+button:hover { transform: scale(1.05); }
+.correct { background-color: #00c853; }
+.wrong { background-color: #d50000; }
+
+.next { background: gold; font-weight: bold; }
+
+.timer {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.progress {
+  height: 10px;
+  background: gray;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 100%;
+  background: lime;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="quiz-box">
+    <div class="timer">Tiempo: <span id="time">15</span>s</div>
+    <div class="progress"><div id="bar" class="progress-bar"></div></div>
+    <h2 id="question"></h2>
+    <div id="answers"></div>
+    <button class="next" onclick="nextQuestion()">Siguiente</button>
+  </div>
+
+  <div class="points-box">
+    <h3>PUNTOS</h3>
+    <p id="score">0</p>
+    <h3>NIVEL</h3>
+    <p id="level">1</p>
+  </div>
+</div>
+
+<script>
+const questions = [
+  { q:"2x + 5 = 11", options:["x=3","x=5","x=6","x=2"], correct:0 },
+  { q:"x^2 - 9 = 0", options:["x=3","x=±3","x=9","x=0"], correct:1 },
+  { q:"Regla de 3: 2→4, 4→?", options:["6","8","10","12"], correct:1 },
+  { q:"2x + 3x", options:["5x","6x","x","2x"], correct:0 },
+  { q:"x + 2 > 5", options:["x>3","x<3","x=3","x≥3"], correct:0 },
+  { q:"√25", options:["4","5","6","7"], correct:1 },
+  { q:"3x - 6 = 0", options:["x=2","x=3","x=6","x=0"], correct:0 },
+  { q:"x^2 = 16", options:["±4","8","16","2"], correct:0 }
+];
+
+let current = 0;
+let score = 0;
+let level = 1;
+let time = 15;
+let timer;
+
+function loadQuestion(){
+  clearInterval(timer);
+  time = 15;
+  startTimer();
+
+  let q = questions[current];
+  document.getElementById("question").innerText = q.q;
+  let answers = document.getElementById("answers");
+  answers.innerHTML = "";
+
+  q.options.forEach((opt,i)=>{
+    let btn = document.createElement("button");
+    btn.innerText = opt;
+    btn.onclick = ()=>checkAnswer(i,btn);
+    answers.appendChild(btn);
+  });
+}
+
+function checkAnswer(i,btn){
+  if(i===questions[current].correct){
+    btn.classList.add("correct");
+    score += 100;
+    level++;
+  }else{
+    btn.classList.add("wrong");
+    score -= 50;
+  }
+  updateUI();
+  clearInterval(timer);
+}
+
+function nextQuestion(){
+  current++;
+  if(current<questions.length){
+    loadQuestion();
+  }else{
+    document.getElementById("question").innerText = "🔥 TERMINASTE EL JUEGO 🔥";
+    document.getElementById("answers").innerHTML = "";
+  }
+}
+
+function updateUI(){
+  document.getElementById("score").innerText = score;
+  document.getElementById("level").innerText = level;
+}
+
+function startTimer(){
+  timer = setInterval(()=>{
+    time--;
+    document.getElementById("time").innerText = time;
+    document.getElementById("bar").style.width = (time/15*100)+"%";
+
+    if(time<=0){
+      clearInterval(timer);
+      score -= 50;
+      updateUI();
+    }
+  },1000);
+}
+
+loadQuestion();
+</script>
+
+</body>
+</html>
